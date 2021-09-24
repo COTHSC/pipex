@@ -20,18 +20,15 @@ char *get_path(t_info *i, char *command)
 		path = ft_strjoin(path_bits, command);
 		free(path_bits);
 		if (access(path, F_OK) == 0)
-		{
-			d = 0;
-			while (paths[d])
-				free(paths[d++]);
 			return path;
-		}
+		free(path);
 		d++;
 	}
 	d = 0;
 	while (paths[d])
 		free(paths[d++]);
-	exit(EXIT_FAILURE);
+	free(paths);
+	//exit(EXIT_FAILURE);
 	return (0);
 }
 
@@ -44,18 +41,24 @@ void execute(t_info *i, char *argv)
 	command = ft_split(argv, ' ');
 	d = 0;
 	path = get_path(i,command[0]);
+	if (!path)
+	{
+			while (command[d])
+				free(command[d++]);
+			free(command);
+			free(i);
+			exit(EXIT_FAILURE);
+	}
 	if (execve(path, command, i->env) == -1)
 	{
-			free(path);
 			free(path);
 			while (command[d])
 				free(command[d++]);
 			exit(EXIT_FAILURE);
 	}
-	free(path);
-	free(path);
-	while (command[d])
-		free(command[d++]);
+			free(path);
+			while (command[d])
+				free(command[d++]);
 }
 
 void execute_child(t_info *i)
@@ -91,6 +94,11 @@ int main(int argc, char **argv, char **env)
 		i->env = env;
 		i->cmd1 = argv[2];
 		i->cmd2 = argv[3];
+		if (i->fd1 == -1 )
+		{
+			free(i);
+			return 0;
+		}
 
 		pid = fork();
 
@@ -99,8 +107,10 @@ int main(int argc, char **argv, char **env)
 		else if (pid == 0)
 		{
 			execute_child(i);
-			exit(1);
+		//	exit(1);
 		}
+		if (pid != 0)
+			waitpid(pid, NULL, 0);
 		execute_parent(i);
 		free(i);
 	}
