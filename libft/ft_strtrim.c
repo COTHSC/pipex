@@ -26,7 +26,7 @@ static int	ft_ischarset(char c, char const *set)
 	return (0);
 }
 
-char		*ft_strtrim(char const *s1, char const *set)
+char	*ft_strtrim(char const *s1, char const *set)
 {
 	size_t		i;
 	size_t		c;
@@ -43,7 +43,8 @@ char		*ft_strtrim(char const *s1, char const *set)
 	while (s1[i] && ft_ischarset(s1[d - 1], set))
 		d--;
 	d = d - i;
-	if (!(str = (char *)malloc(sizeof(char) * (d + 1))))
+	str = (char *)malloc(sizeof(char) * (d + 1));
+	if (!str)
 		return (NULL);
 	while (c < d)
 		str[c++] = s1[i++];

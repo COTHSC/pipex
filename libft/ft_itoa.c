@@ -14,7 +14,7 @@
 
 static int	ilength(long long int number)
 {
-	int i;
+	int	i;
 
 	i = 1;
 	if (number < 0)
@@ -30,13 +30,14 @@ static int	ilength(long long int number)
 	return (i);
 }
 
-char		*ft_itoa(int n)
+char	*ft_itoa(int n)
 {
 	char			*ret;
 	unsigned int	nb;
 	int				len;
 
-	if (!(ret = (char*)malloc(sizeof(char) * (ilength(n) + 1))))
+	ret = (char *)malloc(sizeof(char) * (ilength(n) + 1));
+	if (!ret)
 		return (NULL);
 	ret[ilength(n)] = '\0';
 	nb = n;

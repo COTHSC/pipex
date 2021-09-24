@@ -12,14 +12,14 @@
 
 #include "libft.h"
 
-static int			ft_ischar(char o, char c)
+static int	ft_ischar(char o, char c)
 {
 	if (o == c)
 		return (1);
 	return (0);
 }
 
-static int			ft_countthewords(char const *s, char c)
+static int	ft_countthewords(char const *s, char c)
 {
 	int		i;
 	int		cw;
@@ -41,7 +41,7 @@ static int			ft_countthewords(char const *s, char c)
 	return (cw);
 }
 
-static int			ftwtw(int len, char **strs, int row, const char *s)
+static int	ftwtw(int len, char **strs, int row, const char *s)
 {
 	int		collumn;
 
@@ -55,7 +55,7 @@ static int			ftwtw(int len, char **strs, int row, const char *s)
 	return (row);
 }
 
-char				**ft_split(char const *s, char c)
+char	**ft_split(char const *s, char c)
 {
 	int		wc;
 	char	**strs;
@@ -66,7 +66,8 @@ char				**ft_split(char const *s, char c)
 	row = 0;
 	lead = 0;
 	wc = ft_countthewords(s, c);
-	if (!(strs = (char**)malloc(sizeof(char*) * (wc + 1))))
+	strs = (char **)ft_calloc((wc + 1), sizeof(char *));
+	if (!strs)
 		return (NULL);
 	while (row < wc)
 	{
@@ -75,10 +76,10 @@ char				**ft_split(char const *s, char c)
 		follow = lead;
 		while (!ft_ischar(s[lead], c) && s[lead])
 			lead++;
-		if (!(strs[row] = (char *)malloc(sizeof(char) * ((lead - follow + 1)))))
+		strs[row] = (char *)malloc(sizeof(char) * ((lead - follow + 1)));
+		if (!strs)
 			return (NULL);
 		row = ftwtw(lead - follow, strs, row, (s + follow));
 	}
-	strs[row] = NULL;
 	return (strs);
 }

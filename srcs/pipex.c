@@ -20,9 +20,17 @@ char *get_path(t_info *i, char *command)
 		path = ft_strjoin(path_bits, command);
 		free(path_bits);
 		if (access(path, F_OK) == 0)
+		{
+			d = 0;
+			while (paths[d])
+				free(paths[d++]);
 			return path;
+		}
 		d++;
 	}
+	d = 0;
+	while (paths[d])
+		free(paths[d++]);
 	exit(EXIT_FAILURE);
 	return (0);
 }
@@ -30,10 +38,24 @@ char *get_path(t_info *i, char *command)
 void execute(t_info *i, char *argv)
 {
 	char **command;
-
+	int	d;
+	char *path;
+	
 	command = ft_split(argv, ' ');
-	if (execve(get_path(i, command[0]), command, i->env) == -1)
+	d = 0;
+	path = get_path(i,command[0]);
+	if (execve(path, command, i->env) == -1)
+	{
+			free(path);
+			free(path);
+			while (command[d])
+				free(command[d++]);
 			exit(EXIT_FAILURE);
+	}
+	free(path);
+	free(path);
+	while (command[d])
+		free(command[d++]);
 }
 
 void execute_child(t_info *i)
@@ -80,8 +102,7 @@ int main(int argc, char **argv, char **env)
 			exit(1);
 		}
 		execute_parent(i);
-//		close(i->fd[0]);
-//		close(i->fd[1]);
+		free(i);
 	}
 }
 

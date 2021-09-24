@@ -26,7 +26,7 @@ static int	ft_isdigitt(int c)
 		return (0);
 }
 
-int			ft_isalnum(int c)
+int	ft_isalnum(int c)
 {
 	if (ft_isalphaa(c) || ft_isdigitt(c))
 		return (1);
