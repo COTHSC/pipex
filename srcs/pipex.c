@@ -113,6 +113,7 @@ int main(int argc, char **argv, char **env)
 			waitpid(pid, NULL, 0);
 		execute_parent(i);
 		free(i);
+		return (1);
 	}
 }
 
