@@ -6,7 +6,7 @@
 /*   By: jescully <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/03 14:10:09 by jescully          #+#    #+#             */
-/*   Updated: 2021/12/03 14:51:38 by jescully         ###   ########.fr       */
+/*   Updated: 2021/12/03 14:59:51 by jescully         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,6 @@ int	execute_child(t_info *info, int (*fd)[2], int i, int n)
 	make_redirects(info, i, n);
 	if (execute_binary(info, i))
 		return (1);
-	char *d = malloc(2);
-	(void)d;
 	close(fd[i][0]);
 	close(fd[i + 1][1]);
 	return (0);
