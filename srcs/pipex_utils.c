@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jescully <jescully@42.student.fr>          +#+  +:+       +#+        */
+/*   By: jescully <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/09/30 19:26:29 by jescully          #+#    #+#             */
-/*   Updated: 2021/09/30 19:26:33 by jescully         ###   ########.fr       */
+/*   Created: 2021/12/03 14:09:33 by jescully          #+#    #+#             */
+/*   Updated: 2021/12/03 14:37:43 by jescully         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/pipex.h"                                                  
+#include "../includes/pipex.h"													
 
 void	check_pipe(t_info *i)
 {
@@ -22,44 +22,43 @@ void	check_pipe(t_info *i)
 	}
 }
 
-void	fill_struct(t_info *i, char **argv, char **env)
+void	free_todo(t_info *info)
 {
-	i->fd1 = open(argv[1], O_RDONLY);
-	i->fd2 = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
-	i->env = env;
-	i->cmd1 = argv[2];
-	i->cmd2 = argv[3];
-	check_fd(i->fd2, argv[4], i);
-	check_fd(i->fd1, argv[1], i);
+	int	i;
+	int	d;
+
+	i = 0;
+	while (info->cmds[i])
+	{
+		d = 0;
+		while (info->cmds[i][d])
+			free(info->cmds[i][d++]);
+		free(info->cmds[i++]);
+	}
+	free(info->cmds);
 }
 
-char	*try_paths(char **paths, char *command)
+void	fill_struct(t_info *i, char **argv, char **env, int argc)
 {
-	int		d;
-	char	*path_bits;
-	char	*path;
+	int	n;
+	int	index;
 
-	d = -1;
-	while (paths[++d])
+	n = 2;
+	index = 0;
+	i->env = env;
+	i->fd1 = open(argv[1], O_RDONLY);
+	i->fd2 = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
+	check_fd(i->fd2, argv[argc - 1], i);
+	check_fd(i->fd1, argv[1], i);
+	i->cmds = ft_calloc(sizeof(char *), argc - 2);
+	if (!i->cmds)
+		exit (1);
+	while (n < argc - 1)
 	{
-		path_bits = ft_strjoin(paths[d], "/");
-		path = ft_strjoin(path_bits, command);
-		free(path_bits);
-		if (access(path, F_OK) == 0)
-		{
-			d = 0;
-			while (paths[d])
-				free(paths[d++]);
-			free(paths);
-			return (path);
-		}
-		free(path);
+		i->cmds[index] = ft_split(argv[n], ' ');
+		n++;
+		index++;
 	}
-	d = 0;
-	while (paths[d])
-		free(paths[d++]);
-	free(paths);
-	return (NULL);
 }
 
 void	check_fd(int fd, char *filename, t_info *i)
@@ -67,7 +66,7 @@ void	check_fd(int fd, char *filename, t_info *i)
 	char	*pwd;
 	char	*temp;
 
-	temp = get_pwd(i->env);
+	temp = get_pwd(i->env, "PWD");
 	pwd = ft_strjoin(temp, filename);
 	free(temp);
 	if (fd < 0)
@@ -82,20 +81,26 @@ void	check_fd(int fd, char *filename, t_info *i)
 			ft_putstr_fd(filename, 2);
 			ft_putstr_fd(": No such file or directory\n", 2);
 		}
-		free(i);
 		free(pwd);
-		exit(1);
+		exit(errno);
 	}
 	free(pwd);
 }
 
-char	*get_pwd(char **env)
+char	*get_pwd(char **env, char *s)
 {
 	int	d;
 
 	d = -1;
 	while (env[++d])
-		if (strncmp(env[d], "PWD", 3) == 0)
-			return (ft_strjoin((env[d] + 4), "/"));
+	{
+		if (ft_strncmp(env[d], s, ft_strlen(s)) == 0)
+		{
+			if (ft_strncmp(env[d], "PWD", 3) == 0)
+				return (ft_strjoin((env[d] + 4), "/"));
+			else
+				return (env[d] + 5);
+		}
+	}
 	return (NULL);
 }
